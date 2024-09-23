@@ -4,19 +4,18 @@ import Footer from "./Footer";
 
 
 const MainLayout = ({ children }) => {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main
-          className="flex-grow container mx-auto p-4 "
-          style={{ maxHeight: "calc(100vh - 128px)" }}
-        >
-          {children} {/* Render children ở đây */}
-        </main>
-        <Footer />
-      </div>
-    );
-  };
-  
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main
+        className="flex-grow mx-auto p-6 w-full" // Loại bỏ container giới hạn chiều rộng
+        style={{ maxHeight: "calc(800vh - 128px)" }}
+      >
+        {children}
+      </main>
+      <Footer />
+    </div>
+  );
+};
 
 export default MainLayout;
