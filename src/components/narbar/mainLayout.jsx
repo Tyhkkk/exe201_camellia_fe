@@ -9,7 +9,7 @@ const MainLayout = ({ children }) => {
       <Header />
       <main
         className="flex-grow mx-auto p-6 w-full" // Loại bỏ container giới hạn chiều rộng
-        style={{ maxHeight: "calc(800vh - 128px)" }}
+        style={{ maxHeight: "calc(900vh - 128px)" }}
       >
         {children}
       </main>
