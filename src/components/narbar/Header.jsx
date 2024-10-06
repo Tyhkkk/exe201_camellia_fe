@@ -73,7 +73,7 @@ const Header = () => {
           <Link to="/" className="hover:text-[#a05c55]">
             Home Page
           </Link>
-          <Link to="/about" className="hover:text-[#a05c55]">
+          <Link to="/aboutus" className="hover:text-[#a05c55]">
             About Us
           </Link>
           <div className="relative group">
