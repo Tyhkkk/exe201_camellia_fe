@@ -15,8 +15,8 @@ const ProductCatalogue = () => {
   return (
     <div>
       {/* Product Catalogue Section */}
-      <div className="w-screen py-10 bg-gray-100">
-        <h2 className="text-4xl font-bold text-center mb-8">Product Catalogue</h2>
+      <div className="w-screen py-10 bg-gray-100 text-[#7b3d35]">
+        <h2 className="text-4xl font-bold text-center mb-8 ">Product Catalogue</h2>
         <div className="flex justify-center space-x-4">
           <a href="/scented-candles" className="text-center">
             <img src="/src/assets/6.png" alt="Scented Candles" className="w-40 h-40 object-cover" />
@@ -38,7 +38,7 @@ const ProductCatalogue = () => {
       </div>
 
       {/* The Most Beloved Fragrance Section */}
-      <div className="container mx-auto py-10">
+      <div className="container mx-auto py-10 text-[#7b3d35]">
         <h2 className="text-4xl font-bold text-center mb-8">The Most Beloved Fragrance</h2>
         <div className="relative">
           <div className="flex space-x-6 overflow-x-auto">

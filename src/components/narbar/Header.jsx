@@ -1,9 +1,16 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { IoLocationOutline, IoSearch, IoCartOutline } from "react-icons/io5";
 import { FaPhoneSquare } from "react-icons/fa";
 import { HiOutlineUser } from "react-icons/hi";
 
 const Header = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen((prev) => !prev);
+  };
+
   return (
     <header className="bg-[#fdf6f3] text-[#7b3d35] font-jomolhari py-2">
       {/* Top banner with discount and contact */}
@@ -77,24 +84,59 @@ const Header = () => {
             About Us
           </Link>
           <div className="relative group">
-            <Link to="/products" className="hover:text-[#a05c55]">
+            {/* Products Link with Click to Toggle Dropdown */}
+            <button
+              onClick={toggleDropdown}
+              className="hover:text-[#a05c55] inline-flex items-center"
+            >
               Products
-            </Link>
+              <svg className="w-4 h-4 ml-2" aria-hidden="true" fill="none" viewBox="0 0 10 6">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1l4 4 4-4" />
+              </svg>
+            </button>
             {/* Dropdown for Products */}
-            <div className="absolute hidden group-hover:block bg-white shadow-lg mt-2">
-              <Link
-                to="/products/candles"
-                className="block px-4 py-2 hover:bg-gray-100"
-              >
-                Candles
-              </Link>
-              <Link
-                to="/products/decor"
-                className="block px-4 py-2 hover:bg-gray-100"
-              >
-                Bedroom Decor
-              </Link>
-            </div>
+            {isDropdownOpen && (
+              <div className="absolute bg-white shadow-lg rounded-lg mt-2 w-44 z-50">
+                <ul className="text-sm text-[#7b3d35]">
+                  <li>
+                    <Link
+                      to="/products/scented-candles"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                      onClick={() => setIsDropdownOpen(false)}  // Close dropdown after click
+                    >
+                      SCENTED CANDLES
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/products/essential-oils"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                      onClick={() => setIsDropdownOpen(false)}  // Close dropdown after click
+                    >
+                      ESSENTIAL OILS
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/products/gift-set"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                      onClick={() => setIsDropdownOpen(false)}  // Close dropdown after click
+                    >
+                      GIFT SET
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/products/candle-accessories"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                      onClick={() => setIsDropdownOpen(false)}  // Close dropdown after click
+                    >
+                      CANDLE ACCESSORIES
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            )}
           </div>
           <Link to="/contact" className="hover:text-[#a05c55]">
             Contact Us

@@ -26,7 +26,7 @@ const HomePage = () => {
             to bring a harmonious combination of scent and the most environmentally friendly. 
             The scent notes will help you relieve stress and relax after a tiring day of work.
           </p>
-          <button className="mt-4 px-4 py-2 bg-transparent border border-brown-700 text-brown-700 hover:bg-brown-700 hover:text-[#7b3d35] transition duration-300">
+          <button className="px-6 py-2 mt-4 border border-[#6e3a3a] text-[#6e3a3a]  hover:bg-[#6e3a3a] hover:text-white transition duration-300">
             Buy now
           </button>
         </div>
@@ -44,7 +44,7 @@ const HomePage = () => {
             does not produce petrol carbon. At the same time, when burning scented candles made from
             soy wax, it will not cause an unpleasant burning or smoky smell.
           </p>
-          <button className="mt-4 px-4 py-2 bg-transparent border border-brown-700 text-brown-700 hover:bg-brown-700 hover:text-[#7b3d35] transition duration-300">
+          <button className="px-6 py-2 mt-4 border border-[#6e3a3a] text-[#6e3a3a]  hover:bg-[#6e3a3a] hover:text-white transition duration-300">
             Buy now
           </button>
         </div>
