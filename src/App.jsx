@@ -8,7 +8,7 @@ import ScentedCandle from "./pages/product/scentedCandle";
 import EssentialOils from "./pages/product/essentialOils";
 import GiftSet from "./pages/product/giftSet";
 import CandleAccessories from "./pages/product/candleAccessories";
-
+import SignUp from "./pages/SignUp";
 const App = () => {
   return (
     <Router >
@@ -20,6 +20,7 @@ const App = () => {
         <Route path="/products/essential-oils" element={<MainLayout><EssentialOils /></MainLayout>} />
         <Route path="/products/gift-set" element={<MainLayout><GiftSet /></MainLayout>} />
         <Route path="/products/candle-accessories" element={<MainLayout><CandleAccessories /></MainLayout>} />
+        <Route path="/signup" element={<MainLayout><SignUp /></MainLayout>} />
       </Routes>
     </Router>
   );
