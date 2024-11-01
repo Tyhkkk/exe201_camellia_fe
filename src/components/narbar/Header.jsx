@@ -97,7 +97,7 @@ const Header = () => {
             {/* Dropdown for Products */}
             {isDropdownOpen && (
               <div className="absolute bg-white shadow-lg rounded-lg mt-2 w-44 z-50">
-                <ul className="text-sm text-[#7b3d35]">
+                <ul className="text-xs text-[#7b3d35]">
                   <li>
                     <Link
                       to="/products/scented-candles"
