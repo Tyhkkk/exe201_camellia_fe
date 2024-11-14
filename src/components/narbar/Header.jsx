@@ -1,15 +1,44 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState,useEffect , useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { IoLocationOutline, IoSearch, IoCartOutline } from "react-icons/io5";
-import { FaPhoneSquare } from "react-icons/fa";
+import { FaPhoneSquare, FaCaretDown, FaEye, FaEyeSlash } from "react-icons/fa";
 import { HiOutlineUser } from "react-icons/hi";
+import PropTypes from "prop-types";
+import { useAuth } from "../../context/auth/AuthContext"; // import AuthContext
 
-const Header = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+// Custom hook for detecting clicks outside a specified element
+const useOnClickOutside = (ref, handler) => {
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        handler();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref, handler]);
+};
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
+const Header = ({ walletAmount, showWalletAmount, toggleWalletVisibility }) => {
+  const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const userDropdownRef = useRef(null);
+  const navigate = useNavigate();
+
+  // Sử dụng AuthContext
+  const { user, logout } = useAuth();
+
+  const toggleProductsDropdown = () => {
+    setIsProductsDropdownOpen((prev) => !prev);
   };
+
+  const toggleUserDropdown = () => {
+    setIsUserDropdownOpen((prev) => !prev);
+  };
+
+  useOnClickOutside(userDropdownRef, () => setIsUserDropdownOpen(false));
 
   return (
     <header className="bg-[#fdf6f3] text-[#7b3d35] font-jomolhari py-2">
@@ -22,10 +51,7 @@ const Header = () => {
       <div className="bg-[#a05c55] text-[#fdf6f3] text-xs flex justify-end px-4 py-1 w-full">
         <div className="flex space-x-4 items-center">
           <span>Hotline: 1900 6574 (7h - 12h, 13h - 14h)</span>
-
-          {/* Vách ngăn */}
           <span className="border-l border-[#fdf6f3] h-4 mx-2"></span>
-
           <Link to="/contact" className="hover:underline flex items-center">
             Contact
             <FaPhoneSquare className="ml-1" />
@@ -35,20 +61,17 @@ const Header = () => {
 
       {/* Main Header */}
       <div className="container mx-auto py-4 px-4 lg:px-8">
-        {/* Grid layout with 3 sections */}
         <div className="grid grid-cols-3 items-center">
-          {/* Left side: empty */}
           <div></div>
 
-          {/* Middle: Logo and brand name */}
+          {/* Logo and brand name */}
           <div className="flex flex-col items-center">
             <img src="/src/assets/2.png" alt="Camellia Logo" className="h-10" />
             <h1 className="text-3xl font-bold">Camellia</h1>
           </div>
 
-          {/* Right side: Deliver details and icons */}
+          {/* Deliver details and icons */}
           <div className="flex items-center justify-end space-x-6 text-sm">
-            {/* Deliver details */}
             <div className="flex flex-col text-right">
               <div className="flex items-center space-x-1">
                 <IoLocationOutline className="text-xl" />
@@ -57,7 +80,6 @@ const Header = () => {
               <span>S302, Vinhomes GrandPark</span>
             </div>
 
-            {/* Icons: Search, Cart, User */}
             <Link to="/search" className="text-3xl">
               <IoSearch />
             </Link>
@@ -69,9 +91,54 @@ const Header = () => {
               </span>
             </Link>
 
-            <Link to="/profile" className="text-3xl">
-              <HiOutlineUser />
-            </Link>
+            {/* User Icon with Dropdown */}
+            <div className="relative" ref={userDropdownRef}>
+              <button onClick={toggleUserDropdown} className="text-3xl flex items-center">
+                <HiOutlineUser />
+                <FaCaretDown className="ml-1 text-xl" />
+              </button>
+              {isUserDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 rounded-lg bg-white shadow-lg z-50">
+                  {user ? (
+                    <div className="py-2">
+                      <button onClick={() => navigate("/profile")} className="block px-4 py-2 hover:bg-gray-100">
+                        Hồ sơ
+                      </button>
+                      <button onClick={() => navigate("/orderHistory")} className="block px-4 py-2 hover:bg-gray-100">
+                        Đơn hàng
+                      </button>
+                      <button onClick={() => navigate("/favorite")} className="block px-4 py-2 hover:bg-gray-100">
+                        Yêu thích
+                      </button>
+                      <button onClick={() => navigate("/review-gadget")} className="block px-4 py-2 hover:bg-gray-100">
+                        Đánh giá sản phẩm
+                      </button>
+                      <div className="block px-4 py-2 text-gray-700">
+                        <span>Ví của tôi: </span>
+                        <span className="font-bold ml-2">
+                          {showWalletAmount ? walletAmount : "******"}
+                        </span>
+                        <button onClick={toggleWalletVisibility} className="ml-2">
+                          {showWalletAmount ? <FaEyeSlash /> : <FaEye />}
+                        </button>
+                      </div>
+                      <button onClick={logout} className="block px-4 py-2 text-red-600 hover:bg-gray-100">
+                        Đăng Xuất
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="py-2">
+                      <Link to="/signin" className="block px-4 py-2 hover:bg-gray-100">
+                        Đăng Nhập
+                      </Link>
+                      <Link to="/signup" className="block px-4 py-2 hover:bg-gray-100">
+                        Tạo tài khoản
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -84,53 +151,32 @@ const Header = () => {
             About Us
           </Link>
           <div className="relative group">
-            {/* Products Link with Click to Toggle Dropdown */}
-            <button
-              onClick={toggleDropdown}
-              className="hover:text-[#a05c55] inline-flex items-center"
-            >
+            <button onClick={toggleProductsDropdown} className="hover:text-[#a05c55] inline-flex items-center">
               Products
               <svg className="w-4 h-4 ml-2" aria-hidden="true" fill="none" viewBox="0 0 10 6">
                 <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1l4 4 4-4" />
               </svg>
             </button>
-            {/* Dropdown for Products */}
-            {isDropdownOpen && (
+            {isProductsDropdownOpen && (
               <div className="absolute bg-white shadow-lg rounded-lg mt-2 w-44 z-50">
                 <ul className="text-xs text-[#7b3d35]">
                   <li>
-                    <Link
-                      to="/products/scented-candles"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                      onClick={() => setIsDropdownOpen(false)}  // Close dropdown after click
-                    >
+                    <Link to="/products/scented-candles" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setIsProductsDropdownOpen(false)}>
                       SCENTED CANDLES
                     </Link>
                   </li>
                   <li>
-                    <Link
-                      to="/products/essential-oils"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                      onClick={() => setIsDropdownOpen(false)}  // Close dropdown after click
-                    >
+                    <Link to="/products/essential-oils" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setIsProductsDropdownOpen(false)}>
                       ESSENTIAL OILS
                     </Link>
                   </li>
                   <li>
-                    <Link
-                      to="/products/gift-set"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                      onClick={() => setIsDropdownOpen(false)}  // Close dropdown after click
-                    >
+                    <Link to="/products/gift-set" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setIsProductsDropdownOpen(false)}>
                       GIFT SET
                     </Link>
                   </li>
                   <li>
-                    <Link
-                      to="/products/candle-accessories"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                      onClick={() => setIsDropdownOpen(false)}  // Close dropdown after click
-                    >
+                    <Link to="/products/candle-accessories" className="block px-4 py-2 hover:bg-gray-100" onClick={() => setIsProductsDropdownOpen(false)}>
                       CANDLE ACCESSORIES
                     </Link>
                   </li>
@@ -145,6 +191,13 @@ const Header = () => {
       </div>
     </header>
   );
+};
+
+// PropTypes validation
+Header.propTypes = {
+  walletAmount: PropTypes.number,
+  showWalletAmount: PropTypes.bool,
+  toggleWalletVisibility: PropTypes.func.isRequired,
 };
 
 export default Header;

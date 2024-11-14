@@ -15,7 +15,7 @@ const CandleAccessories = () => {
   return (
     <div className="font-jomolhari text-[#333]">
       {/* Breadcrumb */}
-      <div className="border-t border-b border-[#ddd] py-2 text-start">
+      <div className="border-t border-b border-[#ddd] py-2 text-start ">
         <p className="text-sm ml-20">
           <span 
             className="cursor-pointer hover:underline"
@@ -42,7 +42,7 @@ const CandleAccessories = () => {
         {/* Right: Image */}
         <div className="w-full md:w-1/2">
           <img
-            src="/src/assets/accessory_banner.png"
+            src="/src/assets/ac1.png"
             alt="Candle accessories setup"
             className="w-full h-full object-cover"
           />

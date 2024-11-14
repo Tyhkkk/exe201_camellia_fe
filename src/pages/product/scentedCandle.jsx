@@ -68,7 +68,7 @@ const ScentedCandle = () => {
             <i className="fa-solid fa-sort-alpha-down"></i> {/* Add any sort icon */}
           </div>
         </div>
-
+        <hr className='p-[1px] bg-black mt-3'></hr>
         <div className="px-8 py-8">
           <div className="text-lg font-semibold mb-6 text-left">6 Products</div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
