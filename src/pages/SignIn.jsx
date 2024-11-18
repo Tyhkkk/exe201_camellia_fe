@@ -1,3 +1,4 @@
+// src/pages/SignIn.jsx
 import { useState } from 'react';
 import { useAuth } from '../context/auth/AuthContext';
 
@@ -5,19 +6,16 @@ const SignIn = () => {
   const { login, isLoading } = useAuth();
   const [user, setUser] = useState({
     email: '',
-    password: '',
+    passwordHash: '',
   });
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!user.email || !user.password) {
+    if (!user.email || !user.passwordHash) {
       alert('Please enter both email and password');
       return;
     }
-    await login({
-      email: user.email,
-      password: user.password,
-    });
+    await login(user);
   };
 
   const handleChange = (field, value) => {
@@ -55,8 +53,8 @@ const SignIn = () => {
               type="password"
               placeholder="Please enter your password"
               className="w-full p-4 border border-gray-300 rounded-md bg-[#f7f7f7] focus:outline-none"
-              value={user.password}
-              onChange={(e) => handleChange('password', e.target.value)}
+              value={user.passwordHash}
+              onChange={(e) => handleChange('passwordHash', e.target.value)}
             />
           </div>
           <p className="text-xs text-gray-500">
@@ -74,7 +72,7 @@ const SignIn = () => {
         </form>
         <div className="mt-6 flex justify-between text-sm text-gray-600">
           <a href="/forgot-password" className="hover:text-red-600">Forgot your password?</a>
-          <span>Don`t have an account? <a href="/signup" className="text-red-600 hover:text-red-800">Sign up</a></span>
+          <span>Don’t have an account? <a href="/signup" className="text-red-600 hover:text-red-800">Sign up</a></span>
         </div>
       </div>
     </div>

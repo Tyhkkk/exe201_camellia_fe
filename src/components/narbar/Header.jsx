@@ -197,7 +197,7 @@ const Header = ({ walletAmount, showWalletAmount, toggleWalletVisibility }) => {
 Header.propTypes = {
   walletAmount: PropTypes.number,
   showWalletAmount: PropTypes.bool,
-  toggleWalletVisibility: PropTypes.func.isRequired,
+  toggleWalletVisibility: PropTypes.func,
 };
 
 export default Header;

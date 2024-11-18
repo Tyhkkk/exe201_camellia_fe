@@ -1,7 +1,7 @@
 // import React from "react";
 import Header from "./Header";
 import Footer from "./Footer";
-
+import PropTypes from 'prop-types';
 
 const MainLayout = ({ children }) => {
   return (
@@ -19,3 +19,7 @@ const MainLayout = ({ children }) => {
 };
 
 export default MainLayout;
+
+MainLayout.propTypes = {
+  children: PropTypes.node.isRequired,
+};
