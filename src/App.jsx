@@ -15,6 +15,9 @@ import AdminCandle from "./pages/admin/adminCandle"; // Import your admin page
 import { AuthProvider } from "./context/auth/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectRole";
 import ProductDetail from "./pages/product/productDetail";
+import AdminReview from "./pages/admin/adminReview";
+import AdminUser from "./pages/admin/adminUser";
+import AdminProfile from "./pages/admin/adminProfile";
 const App = () => {
   return (
     <Router>
@@ -24,7 +27,7 @@ const App = () => {
           <Route path="/" element={<MainLayout><HomePage /></MainLayout>} />
           <Route path="/signup" element={<MainLayout><SignUp /></MainLayout>} />
           <Route path="/signin" element={<MainLayout><SignIn /></MainLayout>} />
-          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/product/:id" element={<MainLayout><ProductDetail /></MainLayout>} />
 
           {/* Protected Customer Routes */}
           <Route element={<ProtectedRoute requiredRole="2" />}>
@@ -40,6 +43,9 @@ const App = () => {
           <Route element={<ProtectedRoute requiredRole="1" />}>
             <Route path="/admin" element={<AdminLayout><AdminHome /></AdminLayout>} />
             <Route path="/admin/candle" element={<AdminLayout><AdminCandle /></AdminLayout>} /> {/* Example nested admin page */}
+            <Route path="/admin/review" element={<AdminLayout><AdminReview /></AdminLayout>} /> {/* Example nested admin page */}
+            <Route path="/admin/user" element={<AdminLayout><AdminUser /></AdminLayout>} /> {/* Example nested admin page */}
+            <Route path="/admin/profile" element={<AdminLayout><AdminProfile /></AdminLayout>} /> {/* Example nested admin page */}
           </Route>
 
           {/* Fallback Route */}

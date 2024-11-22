@@ -1,18 +1,32 @@
-// AddCandle.jsx
-import  { useState } from 'react';
-import PropTypes from 'prop-types';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import axios from "axios";
 
 const AddCandle = ({ onClose, onAdd }) => {
   const [newCandle, setNewCandle] = useState({
-    name: '',
-    description: '',
-    price: '',
-    stockQuantity: '',
-    categoryId: '1',
-    createdAt: '',
+    name: "",
+    description: "",
+    price: "",
+    stockQuantity: "",
+    categoryId: "",
     imgFile: null,
   });
+
+  const [categories, setCategories] = useState([]);
+
+  // Fetch categories từ API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("https://localhost:7065/api/Category");
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,18 +40,26 @@ const AddCandle = ({ onClose, onAdd }) => {
   const handleAddCandle = async () => {
     try {
       const formData = new FormData();
-      Object.entries(newCandle).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
+      formData.append("name", newCandle.name);
+      formData.append("description", newCandle.description);
+      formData.append("price", newCandle.price);
+      formData.append("stockQuantity", newCandle.stockQuantity);
+      formData.append("categoryId", newCandle.categoryId);
+      formData.append("createdAt", ""); // Send empty string for createdAt
+      formData.append("updatedAt", ""); // Send empty string for updatedAt
+      if (newCandle.imgFile) {
+        formData.append("imgFile", newCandle.imgFile);
+      }
 
-      await axios.post('https://localhost:7065/api/Candle', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      // Gửi dữ liệu đến URL đúng
+      await axios.post("https://localhost:7065/api/Candle/create", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       onAdd();
       onClose();
     } catch (error) {
-      console.error('Error adding candle:', error);
+      console.error("Error adding candle:", error);
     }
   };
 
@@ -83,16 +105,15 @@ const AddCandle = ({ onClose, onAdd }) => {
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded"
           >
-            <option value="1">Scented</option>
-            <option value="2">Unscented</option>
+            <option value="" disabled>
+              Select Category
+            </option>
+            {categories.map((category) => (
+              <option key={category.categoryId} value={category.categoryId}>
+                {category.name}
+              </option>
+            ))}
           </select>
-          <input
-            type="datetime-local"
-            name="createdAt"
-            value={newCandle.createdAt}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
           <input
             type="file"
             name="imgFile"
@@ -101,10 +122,16 @@ const AddCandle = ({ onClose, onAdd }) => {
           />
         </div>
         <div className="flex justify-end mt-4 space-x-4">
-          <button onClick={onClose} className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"
+          >
             Cancel
           </button>
-          <button onClick={handleAddCandle} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          <button
+            onClick={handleAddCandle}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          >
             Add Candle
           </button>
         </div>

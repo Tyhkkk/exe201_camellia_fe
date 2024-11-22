@@ -1,10 +1,25 @@
 // UpdateCandle.jsx
-import  { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
 const UpdateCandle = ({ candle, onClose, onUpdate }) => {
   const [updatedCandle, setUpdatedCandle] = useState({ ...candle });
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    // Fetch category options from the API
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('https://localhost:7065/api/Category');
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,18 +33,37 @@ const UpdateCandle = ({ candle, onClose, onUpdate }) => {
   const handleUpdateCandle = async () => {
     try {
       const formData = new FormData();
-      Object.entries(updatedCandle).forEach(([key, value]) => {
-        formData.append(key, value);
-      });
 
-      await axios.put(`https://localhost:7065/api/Candle/update/${candle.id}`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      // Append all fields explicitly
+      formData.append('candleId', updatedCandle.candleId);
+      formData.append('name', updatedCandle.name || '');
+      formData.append('description', updatedCandle.description || '');
+      formData.append('price', updatedCandle.price || 0);
+      formData.append('stockQuantity', updatedCandle.stockQuantity || 0);
+      formData.append('categoryId', updatedCandle.categoryId || '1');
+
+      // Add createAt and updateAt as empty (null or empty string)
+      formData.append('createAt', '');
+      formData.append('updateAt', '');
+
+      // Append the image file only if it exists
+      if (updatedCandle.imgFile) {
+        formData.append('imgFile', updatedCandle.imgFile);
+      }
+
+      // Send the PUT request
+      await axios.put(
+        `https://localhost:7065/api/Candle/update/${updatedCandle.candleId}`,
+        formData,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
 
       onUpdate();
       onClose();
     } catch (error) {
-      console.error('Error updating candle:', error);
+      console.error('Error updating candle:', error.response?.data || error.message);
     }
   };
 
@@ -75,16 +109,12 @@ const UpdateCandle = ({ candle, onClose, onUpdate }) => {
             onChange={handleChange}
             className="w-full p-2 border border-gray-300 rounded"
           >
-            <option value="1">Scented</option>
-            <option value="2">Unscented</option>
+            {categories.map((category) => (
+              <option key={category.categoryId} value={category.categoryId}>
+                {category.name}
+              </option>
+            ))}
           </select>
-          <input
-            type="datetime-local"
-            name="createdAt"
-            value={updatedCandle.createdAt}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded"
-          />
           <input
             type="file"
             name="imgFile"
@@ -106,7 +136,15 @@ const UpdateCandle = ({ candle, onClose, onUpdate }) => {
 };
 
 UpdateCandle.propTypes = {
-  candle: PropTypes.object.isRequired,
+  candle: PropTypes.shape({
+    candleId: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    price: PropTypes.number.isRequired,
+    stockQuantity: PropTypes.number.isRequired,
+    categoryId: PropTypes.string.isRequired,
+    imgFile: PropTypes.any,
+  }).isRequired,
   onClose: PropTypes.func.isRequired,
   onUpdate: PropTypes.func.isRequired,
 };

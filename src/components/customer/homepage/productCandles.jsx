@@ -10,19 +10,24 @@ const ProductCandles = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("https://localhost:7065/api/Candle")
-      .then((response) => response.json())
-      .then((data) => {
-        const formattedData = data.map((candle) => ({
-          id: candle.id,
-          name: candle.name,
-          price: `${candle.price}đ`,
-          img: candle.imgUrl,
-        }));
-        setCandles(formattedData);
-      })
-      .catch((error) => console.error("Error fetching data:", error));
+    fetchCandles();
   }, []);
+
+  const fetchCandles = async () => {
+    try {
+      const response = await fetch("https://localhost:7065/api/Candle");
+      const data = await response.json();
+      const formattedData = data.map((candle) => ({
+        id: candle.candleId, // Use candleId from API response
+        name: candle.name,
+        price: `${candle.price.toLocaleString()}đ`,
+        img: candle.imgUrl,
+      }));
+      setCandles(formattedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
 
   const handleProductClick = (id) => {
     navigate(`/product/${id}`);
@@ -37,7 +42,7 @@ const ProductCandles = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 px-4">
         {candles.map((candle) => (
           <div
-            key={candle.id}
+            key={candle.id} // Unique key from candleId
             onClick={() => handleProductClick(candle.id)}
             className="bg-white shadow-lg rounded-lg p-4 cursor-pointer hover:shadow-xl transition-shadow duration-300"
           >
@@ -63,7 +68,7 @@ const ProductCandles = () => {
         <h2 className="text-3xl font-semibold text-[#6e3a3a] mb-4">The Origin of Camellia</h2>
         <p className="text-gray-500 max-w-3xl mx-auto">
           Amidst the hustle and bustle of life, Camellia stands as an elegant tea blossom, bringing you moments of relaxation and
-          tranquility with its fresh, cool, and sophisticated scents. It`s not just about the warm, rich notes, CAMELLIA is also a
+          tranquility with its fresh, cool, and sophisticated scents. It’s not just about the warm, rich notes, CAMELLIA is also a
           captivating symphony, weaving profound stories about how each of us perceives nature, life, and humanity.
         </p>
       </div>
@@ -95,7 +100,7 @@ const ProductCandles = () => {
         <div className="text-center">
           <CiRedo className="mx-auto text-4xl text-[#6e3a3a] mb-2" />
           <p className="text-lg font-semibold text-[#6e3a3a]">Easy Returns</p>
-          <p className="text-gray-500">7 days manufacturer`s warranty</p>
+          <p className="text-gray-500">7 days manufacturer’s warranty</p>
         </div>
       </div>
     </div>

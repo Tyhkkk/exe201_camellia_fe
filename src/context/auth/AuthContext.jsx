@@ -16,14 +16,18 @@ export const AuthProvider = ({ children }) => {
   const decodeToken = (token) => {
     try {
       const decoded = jwtDecode(token);
+      const userId = decoded.UserId; // Extract the UserId from the token
+      localStorage.setItem('userId', userId); // Store UserId in localStorage
+
       setUser({
         sub: decoded.sub,
         name: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
         role: decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+        userId: userId, // Add UserId to the user state
       });
       setIsAuthenticated(true);
     } catch (error) {
-      console.error("Error decoding token:", error);
+      console.error('Error decoding token:', error);
       logout();
     }
   };
@@ -42,7 +46,7 @@ export const AuthProvider = ({ children }) => {
         setToken(token);
         localStorage.setItem('token', token);
         decodeToken(token);
-        
+
         // Navigate based on role
         const role = jwtDecode(token)['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
         if (role === '1') {
@@ -51,11 +55,11 @@ export const AuthProvider = ({ children }) => {
           navigate('/');
         }
       } else {
-        alert("Login failed");
+        alert('Login failed');
       }
     } catch (error) {
-      console.error("Login error:", error);
-      alert("Login failed, please check your credentials");
+      console.error('Login error:', error);
+      alert('Login failed, please check your credentials');
     }
   };
 
@@ -64,6 +68,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setIsAuthenticated(false);
     localStorage.removeItem('token');
+    localStorage.removeItem('userId'); // Remove UserId from localStorage
     navigate('/signin');
   };
 
