@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { FaChartBar, FaSignOutAlt, FaBook, FaFolderOpen, FaUser, FaCog } from 'react-icons/fa';
+import { FaChartBar, FaSignOutAlt, FaBook, FaFolderOpen, FaUser } from 'react-icons/fa';
+import { BiSolidCategory } from "react-icons/bi";
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
@@ -24,21 +25,21 @@ const AdminSidebar = () => {
         <Link to="/admin/candle" className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-100">
           <FaChartBar className="mr-3 text-gray-600" /> Candles
         </Link>
-        <Link to="/admin/others" className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-100">
-          <FaBook className="mr-3 text-gray-600" /> Others
+        <Link to="/admin/order" className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-100">
+          <FaBook className="mr-3 text-gray-600" /> Orders
           <span className="ml-auto bg-blue-100 text-blue-500 text-xs font-semibold px-2 py-0.5 rounded-full">14</span>
         </Link>
+        <Link to="/admin/category" className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-100">
+          <BiSolidCategory className="mr-3 text-gray-600" /> Category
+        </Link>
         <Link to="/admin/review" className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-100">
-          <FaFolderOpen className="mr-3 text-gray-600" /> Review
+          <FaFolderOpen className="mr-3 text-gray-600" /> Review 
         </Link>
         <Link to="/admin/user" className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-100">
-          <FaUser className="mr-3 text-gray-600" /> User
+          <FaUser className="mr-3 text-gray-600" /> User Account
         </Link>
         <Link to="/admin/profile" className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-100">
-          <FaUser className="mr-3 text-gray-600" /> Profile
-        </Link>
-        <Link to="/admin/settings" className="flex items-center px-4 py-2 rounded-lg hover:bg-blue-100">
-          <FaCog className="mr-3 text-gray-600" /> Settings
+          <FaUser className="mr-3 text-gray-600" /> Profile 
         </Link>
       </nav>
 

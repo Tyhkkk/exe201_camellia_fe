@@ -18,6 +18,9 @@ import ProductDetail from "./pages/product/productDetail";
 import AdminReview from "./pages/admin/adminReview";
 import AdminUser from "./pages/admin/adminUser";
 import AdminProfile from "./pages/admin/adminProfile";
+import AdminCategory from "./pages/admin/adminCategory";
+import Orders from "./pages/admin/adminOrders";
+import YourCart from "./pages/product/yourCart";
 const App = () => {
   return (
     <Router>
@@ -27,12 +30,13 @@ const App = () => {
           <Route path="/" element={<MainLayout><HomePage /></MainLayout>} />
           <Route path="/signup" element={<MainLayout><SignUp /></MainLayout>} />
           <Route path="/signin" element={<MainLayout><SignIn /></MainLayout>} />
-          <Route path="/product/:id" element={<MainLayout><ProductDetail /></MainLayout>} />
+          <Route path="/product/:candleId" element={<MainLayout><ProductDetail /></MainLayout>} />
 
           {/* Protected Customer Routes */}
           <Route element={<ProtectedRoute requiredRole="2" />}>
             <Route path="/aboutus" element={<MainLayout><AboutUs /></MainLayout>} />
             <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
+            <Route path="/cart" element={<MainLayout><YourCart /></MainLayout>} />
             <Route path="/products/scented-candles" element={<MainLayout><ScentedCandle /></MainLayout>} />
             <Route path="/products/essential-oils" element={<MainLayout><EssentialOils /></MainLayout>} />
             <Route path="/products/gift-set" element={<MainLayout><GiftSet /></MainLayout>} />
@@ -43,6 +47,8 @@ const App = () => {
           <Route element={<ProtectedRoute requiredRole="1" />}>
             <Route path="/admin" element={<AdminLayout><AdminHome /></AdminLayout>} />
             <Route path="/admin/candle" element={<AdminLayout><AdminCandle /></AdminLayout>} /> {/* Example nested admin page */}
+            <Route path="/admin/order" element={<AdminLayout><Orders /></AdminLayout>} /> {/* Example nested admin page */}
+            <Route path="/admin/category" element={<AdminLayout><AdminCategory /></AdminLayout>} /> {/* Example nested admin page */}
             <Route path="/admin/review" element={<AdminLayout><AdminReview /></AdminLayout>} /> {/* Example nested admin page */}
             <Route path="/admin/user" element={<AdminLayout><AdminUser /></AdminLayout>} /> {/* Example nested admin page */}
             <Route path="/admin/profile" element={<AdminLayout><AdminProfile /></AdminLayout>} /> {/* Example nested admin page */}
