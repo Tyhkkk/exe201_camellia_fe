@@ -1,45 +1,45 @@
-import  { useState } from "react";
-import { CiCirclePlus, CiCircleMinus } from "react-icons/ci";
+import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { updateQuantity } from '../../store/cartSlice'; // Ensure this path is correct
 
-const QuantityInput = () => {
-  const [quantity, setQuantity] = useState(1);
+const QuantityInput = ({ candleId, initialQuantity, onChange }) => {
+  const dispatch = useDispatch();
+  const [quantity, setQuantity] = useState(initialQuantity);
 
-  // Hàm xử lý tăng số lượng
+  useEffect(() => {
+    setQuantity(initialQuantity); // Sync with prop changes (in case initialQuantity changes)
+  }, [initialQuantity]);
+
   const handleIncrease = () => {
-    setQuantity((prev) => prev + 1);
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    onChange(newQuantity);  // Pass the updated quantity back to the parent
   };
 
-  // Hàm xử lý giảm số lượng
   const handleDecrease = () => {
-    setQuantity((prev) => (prev > 1 ? prev - 1 : 1)); // Không giảm dưới 1
+    if (quantity > 1) {
+      const newQuantity = quantity - 1;
+      setQuantity(newQuantity);
+      onChange(newQuantity);  // Pass the updated quantity back to the parent
+    }
   };
 
   return (
     <div className="flex items-center gap-2">
-      {/* Nút giảm */}
       <button
         onClick={handleDecrease}
-        className="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 focus:outline-none"
-        aria-label="Decrease quantity"
+        className="bg-gray-100 h-full w-10 font-bold text-xl rounded-xl flex justify-center items-center"
       >
-        <CiCircleMinus size={24} />
+        -
       </button>
-
-      {/* Hiển thị số lượng */}
-      <input
-        type="text"
-        value={quantity}
-        readOnly
-        className="w-12 text-center border border-gray-300 rounded-lg text-lg bg-white"
-      />
-
-      {/* Nút tăng */}
+      <span className="bg-gray-200 h-full w-10 font-bold text-xl rounded-xl flex justify-center items-center">
+        {quantity}
+      </span>
       <button
         onClick={handleIncrease}
-        className="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 focus:outline-none"
-        aria-label="Increase quantity"
+        className="bg-gray-100 h-full w-10 font-bold text-xl rounded-xl flex justify-center items-center"
       >
-        <CiCirclePlus size={24} />
+        +
       </button>
     </div>
   );

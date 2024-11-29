@@ -21,6 +21,7 @@ import AdminProfile from "./pages/admin/adminProfile";
 import AdminCategory from "./pages/admin/adminCategory";
 import Orders from "./pages/admin/adminOrders";
 import YourCart from "./pages/product/yourCart";
+import PayDetail from "./pages/product/payDetail";
 const App = () => {
   return (
     <Router>
@@ -31,12 +32,14 @@ const App = () => {
           <Route path="/signup" element={<MainLayout><SignUp /></MainLayout>} />
           <Route path="/signin" element={<MainLayout><SignIn /></MainLayout>} />
           <Route path="/product/:candleId" element={<MainLayout><ProductDetail /></MainLayout>} />
+          {/* <Route path="/paydetail" element={<MainLayout><PayDetail /></MainLayout>} /> */}
 
           {/* Protected Customer Routes */}
           <Route element={<ProtectedRoute requiredRole="2" />}>
             <Route path="/aboutus" element={<MainLayout><AboutUs /></MainLayout>} />
             <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
             <Route path="/cart" element={<MainLayout><YourCart /></MainLayout>} />
+            <Route path="/paydetail" element={<MainLayout><PayDetail /></MainLayout>} />
             <Route path="/products/scented-candles" element={<MainLayout><ScentedCandle /></MainLayout>} />
             <Route path="/products/essential-oils" element={<MainLayout><EssentialOils /></MainLayout>} />
             <Route path="/products/gift-set" element={<MainLayout><GiftSet /></MainLayout>} />

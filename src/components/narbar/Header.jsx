@@ -1,12 +1,11 @@
-import { useState,useEffect , useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { IoLocationOutline, IoSearch, IoCartOutline } from "react-icons/io5";
 import { FaPhoneSquare, FaCaretDown, FaEye, FaEyeSlash } from "react-icons/fa";
 import { HiOutlineUser } from "react-icons/hi";
-import PropTypes from "prop-types";
 import { useAuth } from "../../context/auth/AuthContext"; // import AuthContext
+import { useSelector } from "react-redux";  // Import useSelector to access cart items
 
-// Custom hook for detecting clicks outside a specified element
 const useOnClickOutside = (ref, handler) => {
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -21,14 +20,17 @@ const useOnClickOutside = (ref, handler) => {
   }, [ref, handler]);
 };
 
-const Header = ({ walletAmount, showWalletAmount, toggleWalletVisibility }) => {
+const Header = () => {
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [showWalletAmount, setShowWalletAmount] = useState(false);  // Local state for wallet visibility
+  const [walletAmount] = useState(1000);  // Example wallet amount, can be dynamic from user data
   const userDropdownRef = useRef(null);
   const navigate = useNavigate();
 
-  // Sử dụng AuthContext
   const { user, logout } = useAuth();
+  const cartItems = useSelector((state) => state.cart.items);  // Get cart items from Redux
+  const totalItemsInCart = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   const toggleProductsDropdown = () => {
     setIsProductsDropdownOpen((prev) => !prev);
@@ -38,11 +40,14 @@ const Header = ({ walletAmount, showWalletAmount, toggleWalletVisibility }) => {
     setIsUserDropdownOpen((prev) => !prev);
   };
 
+  const toggleWalletVisibility = () => {
+    setShowWalletAmount((prev) => !prev);  // Toggle wallet visibility
+  };
+
   useOnClickOutside(userDropdownRef, () => setIsUserDropdownOpen(false));
 
   return (
     <header className="bg-[#fdf6f3] text-[#7b3d35] font-jomolhari py-2">
-      {/* Top banner with discount and contact */}
       <div className="text-center">
         <span>
           CLICK ON CAMXINCHAO - UP TO 10% DISCOUNT FOR ALL ORDERS ON THE WEBSITE
@@ -59,18 +64,15 @@ const Header = ({ walletAmount, showWalletAmount, toggleWalletVisibility }) => {
         </div>
       </div>
 
-      {/* Main Header */}
       <div className="container mx-auto py-4 px-4 lg:px-8">
         <div className="grid grid-cols-3 items-center">
           <div></div>
 
-          {/* Logo and brand name */}
           <div className="flex flex-col items-center">
             <img src="/src/assets/2.png" alt="Camellia Logo" className="h-10" />
             <h1 className="text-3xl font-bold">Camellia</h1>
           </div>
 
-          {/* Deliver details and icons */}
           <div className="flex items-center justify-end space-x-6 text-sm">
             <div className="flex flex-col text-right">
               <div className="flex items-center space-x-1">
@@ -86,12 +88,13 @@ const Header = ({ walletAmount, showWalletAmount, toggleWalletVisibility }) => {
 
             <Link to="/cart" className="text-3xl relative">
               <IoCartOutline />
-              <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs px-1">
-                0
-              </span>
+              {totalItemsInCart > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white rounded-full text-xs px-1">
+                  {totalItemsInCart}
+                </span>
+              )}
             </Link>
 
-            {/* User Icon with Dropdown */}
             <div className="relative" ref={userDropdownRef}>
               <button onClick={toggleUserDropdown} className="text-3xl flex items-center">
                 <HiOutlineUser />
@@ -142,7 +145,6 @@ const Header = ({ walletAmount, showWalletAmount, toggleWalletVisibility }) => {
           </div>
         </div>
 
-        {/* Navigation Links */}
         <nav className="flex justify-center space-x-8 text-lg mt-4">
           <Link to="/" className="hover:text-[#a05c55]">
             Home Page
@@ -191,13 +193,6 @@ const Header = ({ walletAmount, showWalletAmount, toggleWalletVisibility }) => {
       </div>
     </header>
   );
-};
-
-// PropTypes validation
-Header.propTypes = {
-  walletAmount: PropTypes.number,
-  showWalletAmount: PropTypes.bool,
-  toggleWalletVisibility: PropTypes.func,
 };
 
 export default Header;

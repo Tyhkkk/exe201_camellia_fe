@@ -1,29 +1,38 @@
-import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
-import QuantityInput from "../../components/Util/quantity";
-import { addToCart } from "../../store/cartSlice";
+import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import QuantityInput from '../../components/Util/quantity';  // Assuming you have QuantityInput component
+import { addToCart } from '../../store/cartSlice';  // Assuming you have addToCart action defined
 import { useDispatch } from 'react-redux';
 
 const ProductDetail = () => {
   const dispatch = useDispatch();
-  const [quantity, setQuantity] = useState(1);
-  const { candleId } = useParams(); // Get `candleId` from the URL
-  const [product, setProduct] = useState(null);
-  const [relatedProducts, setRelatedProducts] = useState([]);
+  const { candleId } = useParams();  // Get candleId from URL
+  const [quantity, setQuantity] = useState(1); // Manage the quantity state
+  const [product, setProduct] = useState(null); // Product data
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]); // Loading state
+  const [error, setError] = useState(null); // Error state
 
-  const handleAddToCart = () => {
-    dispatch(
-      addToCart({
-        id: product.id,
-        name: product.name,
-        imgUrl: product.imgUrl,
-        price: product.price,
-        quantity,
-      })
-    );
-  };
+  // Fetch product details from API
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`https://localhost:7065/api/Candle/get-by-id/${candleId}`);
+        if (!response.ok) throw new Error('Failed to fetch product data');
+        const data = await response.json();
+        setProduct({
+          ...data,
+          price: `${data.price.toLocaleString()}`, // Format price
+        });
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to load product details');
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [candleId]);
 
   useEffect(() => {
     // Fetch product details
@@ -36,7 +45,7 @@ const ProductDetail = () => {
         const data = await response.json();
         setProduct({
           ...data,
-          price: `${data.price.toLocaleString()}đ`,
+          price: `${data.price.toLocaleString()}`,
         });
 
         // Fetch related products (4 products following the current candleId)
@@ -60,13 +69,33 @@ const ProductDetail = () => {
     fetchProduct();
   }, [candleId]);
 
+  // Handle quantity changes (from QuantityInput component)
+  const handleQuantityChange = (newQuantity) => {
+    setQuantity(newQuantity);  // Update quantity in the local state
+  };
+
+  // Handle adding the product to the cart
+  const handleAddToCart = () => {
+    if (product) {
+      dispatch(
+        addToCart({
+          candleId: product.candleId,
+          name: product.name,
+          price: product.price,
+          quantity,  // Send the updated quantity
+          imgUrl: product.imgUrl,
+        })
+      );
+    }
+  };
+
+  // If product is still loading
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
-  if (!product) return <p>Product not found.</p>;
 
   return (
     <div>
-      {/* Breadcrumb */}
+      {/* Navigation Breadcrumb */}
       <div className="w-full mx-auto px-4">
       <hr className="p-[1px] bg-gray-500 mt-5"></hr>
         <nav className="text-sm text-gray-500 mt-3 ml-48">
@@ -76,39 +105,25 @@ const ProductDetail = () => {
         </nav>
         <hr className="p-[1px] bg-gray-500 mt-5"></hr>
       </div>
-    <div className="bg-[#fdfaf5] py-10">
-      
 
-      {/* Product Details */}
-      <div className="max-w-6xl mx-auto px-4 mt-6 flex gap-10">
-        {/* Product Images */}
-        <div className="w-1/2">
-          <img
-            src={product.imgUrl}
-            alt={product.name}
-            className="w-full h-96 object-cover rounded-md"
-          />
-          <div className="flex gap-4 mt-4">
-            {Array(4)
-              .fill(product.imgUrl) // Placeholder: Use product.imgUrl
-              .map((img, idx) => (
-                <img
-                  key={idx}
-                  src={img}
-                  alt={`Thumbnail ${idx + 1}`}
-                  className="w-20 h-20 object-cover rounded-md cursor-pointer border border-gray-200"
-                />
-              ))}
+      <div className="bg-[#fdfaf5] py-10">
+        <div className="max-w-6xl mx-auto px-4 mt-6 flex gap-10">
+          {/* Product Image */}
+          <div className="w-1/2">
+            <img
+              src={product.imgUrl}
+              alt={product.name}
+              className="w-full h-96 object-cover rounded-md"
+            />
           </div>
-        </div>
 
-        {/* Product Info */}
-        <div className="w-1/2 space-y-4">
-          <h1 className="text-4xl font-bold text-[#6e3a3a]">{product.name}</h1>
-          <p className="text-gray-600 text-sm">Product Code: CAMELLIA0TC</p>
-          <p className="text-gray-600 text-sm">Status: In Stock</p>
-          <p className="text-3xl font-semibold text-[#6e3a3a]">{product.price}</p>
-          <div>
+          {/* Product Info and Quantity Input */}
+          <div className="w-1/2 space-y-4">
+            <h1 className="text-4xl font-bold text-[#6e3a3a]">{product.name}</h1>
+            <p className="text-gray-600 text-sm">Product Code: CAMELLIA{product.candleId}TC</p>
+            <p className="text-gray-600 text-sm">Status: In Stock</p>
+            <p className="text-3xl font-semibold text-[#6e3a3a]">{product.price}</p>
+            <div>
             <p className="text-gray-600 text-sm">Wax Type</p>
             <div className="flex gap-4">
               <button className="border px-4 py-1 rounded-lg text-gray-600">SOY</button>
@@ -118,17 +133,24 @@ const ProductDetail = () => {
           <p className="text-gray-600">
             Estimated Burn Time: <strong>25 hours, 50 hours, 60 hours, 80 Hours</strong>
           </p>
-          <div className="flex items-center gap-4">
-          <QuantityInput value={quantity} onChange={(val) => setQuantity(val)}/>
-            <button className="bg-[#d88d8d] text-white px-6 py-2 rounded-md" onClick={handleAddToCart} >ADD TO CART</button>
-          </div>
-          <button className="bg-[#6e3a3a] text-white px-6 py-2 rounded-md">BUY NOW</button>
-        </div>
-      </div>
+            {/* Quantity Input */}
+            <QuantityInput
+              candleId={product.candleId}  // Pass the candleId for each product
+              initialQuantity={quantity}  // Set initial quantity to 1 (or passed value)
+              onChange={handleQuantityChange}  // Handle quantity change
+            />
 
-      {/* Product Description */}
-      
-      <div className="max-w-6xl mx-auto px-4 mt-10">
+            {/* Add to Cart Button */}
+            <button
+              className="bg-[#d88d8d] text-white px-6 py-2 rounded-md"
+              onClick={handleAddToCart} // Add product to cart with current quantity
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+
+        <div className="max-w-6xl mx-auto px-4 mt-10">
         <h2 className="text-2xl font-semibold text-[#6e3a3a]">PRODUCT DESCRIPTION</h2>
         <hr className="p-[1px] bg-black mt-5"></hr>
         <section className="mt-4">
@@ -152,8 +174,8 @@ const ProductDetail = () => {
         </section>
       </div>
 
-      {/* Related Products */}
-      <div className="max-w-6xl mx-auto px-4 mt-10">
+            {/* Related Products */}
+            <div className="max-w-6xl mx-auto px-4 mt-10">
         <h2 className="text-2xl font-semibold text-[#6e3a3a]">Related Products</h2>
         <div className="flex gap-6 mt-6">
           {relatedProducts.map((related) => (
@@ -173,7 +195,7 @@ const ProductDetail = () => {
           ))}
         </div>
       </div>
-    </div>
+      </div>
     </div>
   );
 };
