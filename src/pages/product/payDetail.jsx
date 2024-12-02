@@ -1,21 +1,62 @@
-import { useLocation } from "react-router-dom"; // Correct import for useLocation
+import { useState } from 'react';
+import { useLocation } from "react-router-dom";
 import axios from "axios";
+import { toast } from 'react-toastify';
 
 const PayDetail = () => {
   const location = useLocation();
-  const orderData = location.state?.orderData; // Safely access orderData
+  const orderData = location.state?.orderData || {}; // Safely access orderData with a default empty object
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleOrder = async () => {
+    setIsLoading(true);
     try {
-      const response = await axios.post('https://localhost:7065/api/Order/create', orderData); 
-      console.log('Order Data:', orderData);// Replace with your API URL
-      if (response.data.status === 'PENDING') {
-        window.location.href = response.data.checkoutUrl; // Redirect to checkout page
+      console.log('Sending order data:', orderData);
+      const response = await axios.post('https://localhost:7065/api/Order/create', orderData);
+      console.log('Full API response:', response);
+  
+      if (response.data && response.data.data) {
+        console.log('Response data:', response.data.data);
+        
+        if (response.data.data.checkoutUrl) {
+          console.log('Checkout URL found:', response.data.data.checkoutUrl);
+          
+          // Attempt to redirect
+          console.log('Attempting to redirect to:', response.data.data.checkoutUrl);
+          window.location.href = response.data.data.checkoutUrl;
+          
+          // Check if redirection didn't happen immediately
+          setTimeout(() => {
+            if (window.location.href !== response.data.data.checkoutUrl) {
+              console.error('Redirection failed. Current URL:', window.location.href);
+              toast.error('Không thể chuyển hướng đến trang thanh toán. Vui lòng thử lại.');
+            }
+          }, 1000);
+        } else {
+          console.error('No checkoutUrl in response data');
+          toast.error('Không nhận được URL thanh toán từ máy chủ. Vui lòng thử lại.');
+        }
+      } else {
+        console.error('Invalid response structure');
+        toast.error('Không nhận được phản hồi hợp lệ từ máy chủ. Vui lòng thử lại.');
       }
     } catch (error) {
       console.error('Error creating order:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+        console.error('Error status:', error.response.status);
+        console.error('Error headers:', error.response.headers);
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+      } else {
+        console.error('Error message:', error.message);
+      }
+      toast.error('Đã xảy ra lỗi khi tạo đơn hàng. Vui lòng thử lại.');
+    } finally {
+      setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="bg-[#f5f5f5] py-10">
@@ -29,12 +70,12 @@ const PayDetail = () => {
             <h3 className="text-xl font-semibold text-[#6e3a3a] mb-4">Order Summary</h3>
             <div className="mb-4">
               <p className="font-semibold text-gray-700">Description: <span className="text-[#6e3a3a]">{orderData.description}</span></p>
-              <p className="font-semibold text-gray-700 mt-2">Total: <span className="text-xl text-[#6e3a3a]">{orderData.price.toLocaleString()} VND</span></p>
+              <p className="font-semibold text-gray-700 mt-2">Total: <span className="text-xl text-[#6e3a3a]">{orderData.price?.toLocaleString()} VND</span></p>
             </div>
 
             <h4 className="text-lg font-semibold text-[#6e3a3a] mt-4">Order Items</h4>
             <ul className="list-disc list-inside text-gray-700 mt-2">
-              {orderData.orderItems.map((item, index) => (
+              {orderData.orderItems?.map((item, index) => (
                 <li key={index}>
                   {item.productName} x {item.quantity} = {(item.priceItem * item.quantity).toLocaleString()} VND
                 </li>
@@ -67,11 +108,15 @@ const PayDetail = () => {
               </div>
             </div>
 
+            {/* Confirm Order Button */}
             <button
               onClick={handleOrder}
-              className="w-full bg-[#6e3a3a] text-white py-4 rounded-md font-semibold text-lg hover:bg-[#a24c4c]"
+              disabled={isLoading}
+              className={`w-full bg-[#6e3a3a] text-white py-4 rounded-md font-semibold text-lg ${
+                isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#a24c4c]'
+              }`}
             >
-              Confirm Order
+              {isLoading ? 'Processing...' : 'Confirm Order'}
             </button>
           </div>
 

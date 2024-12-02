@@ -26,7 +26,7 @@ const YourCart = () => {
     const orderItems = cartItems.map(item => ({
       productName: item.name,
       quantity: item.quantity,
-      priceItem: item.price,  // Ensure this is a number, not a string with commas
+      priceItem: parseInt(item.price.toString().replace(/,/g, '')),  // Ensure this is a number, not a string with commas
     }));
   
     // Calculate total price as a number (without formatting)
@@ -35,8 +35,8 @@ const YourCart = () => {
     const orderData = {
       description: 'Lô Hàng Nến Thơm',  // Ensure this is a proper string description
       price: totalPrice,  // Ensure totalPrice is a number, not formatted
-      returnUrl: '',  // leave empty for now
-      cancelUrl: '',  // leave empty for now
+      returnUrl: 'http://localhost:5173',  // leave empty for now
+      cancelUrl: 'http://localhost:5173',  // leave empty for now
       orderItems: orderItems,
     };
   
