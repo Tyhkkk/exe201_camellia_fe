@@ -4,7 +4,6 @@ import AdminLayout from "./components/narbar/adminLayout";
 import HomePage from "./pages/HomePage";
 import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";
-import ScentedCandle from "./pages/product/ScentedCandle";
 import EssentialOils from "./pages/product/EssentialOils";
 import GiftSet from "./pages/product/GiftSet";
 import CandleAccessories from "./pages/product/CandleAccessories";
@@ -24,6 +23,9 @@ import YourCart from "./pages/product/yourCart";
 import PayDetail from "./pages/product/payDetail";
 import Success from "./pages/success";
 import ProfileCustomer from "./pages/user/profileCus";
+import ScentedCandle from "./pages/product/ScentedCandle";
+
+
 const App = () => {
   return (
     <Router>
