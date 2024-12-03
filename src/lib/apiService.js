@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 const apiClient = axios.create({
-  baseURL: 'https://localhost:7065/api', // Thiết lập base URL của API
+  baseURL: import.meta.env.VITE_API_URL, // Không cần đặt trong dấu nháy
   headers: {
     'Content-Type': 'application/json',
   },
@@ -16,7 +16,9 @@ export const login = async (username, password) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error logging in:", error);
+    console.error('Error logging in:', error);
     throw error;
   }
 };
+
+export default apiClient;

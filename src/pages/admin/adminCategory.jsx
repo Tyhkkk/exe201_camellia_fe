@@ -1,61 +1,65 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { FaPlus, FaTrash } from 'react-icons/fa';
+import { useEffect, useState } from "react";
+import apiClient from "../../lib/apiService"; // Sử dụng apiClient
+import { FaPlus, FaTrash } from "react-icons/fa";
 
 const AdminCategory = () => {
   const [categories, setCategories] = useState([]);
-  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newCategoryName, setNewCategoryName] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Fetch categories from API
+  // Fetch categories từ API
   useEffect(() => {
     fetchCategories();
   }, []);
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get('https://localhost:7065/api/Category');
+      const response = await apiClient.get("/api/Category");
       setCategories(response.data);
-    } catch (error) {
-      console.error('Error fetching categories:', error);
+    } catch (err) {
+      console.error("Error fetching categories:", err);
+      setError("Failed to load categories. Please try again.");
     }
   };
 
   const addCategory = async () => {
     if (!newCategoryName.trim()) {
-      alert('Please enter a category name.');
+      alert("Please enter a valid category name.");
       return;
     }
 
     try {
       const formData = new FormData();
-      formData.append('Name', newCategoryName);
+      formData.append("Name", newCategoryName);
 
-      await axios.post('https://localhost:7065/api/Category/create', formData, {
+      const response = await apiClient.post("/api/Category/create", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      // Refresh categories list
-      fetchCategories();
-      setNewCategoryName('');
+      // Thêm category mới vào danh sách
+      setCategories((prev) => [...prev, response.data]);
+      setNewCategoryName("");
       setShowAddModal(false);
-    } catch (error) {
-      console.error('Error adding category:', error.response?.data || error.message);
-      alert(`Failed to add category: ${error.response?.data?.message || error.message}`);
+    } catch (err) {
+      console.error("Error adding category:", err.response?.data || err.message);
+      alert(`Failed to add category: ${err.response?.data?.message || err.message}`);
     }
   };
 
   const deleteCategory = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this category?')) return;
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
 
     try {
-      await axios.delete(`https://localhost:7065/api/Category/delete-cate/${id}`);
-      setCategories(categories.filter((category) => category.categoryId !== id));
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      alert(`Failed to delete category: ${error.response?.data?.message || error.message}`);
+      await apiClient.delete(`/api/Category/delete-cate/${id}`);
+
+      // Xóa category khỏi danh sách hiện tại
+      setCategories((prev) => prev.filter((category) => category.categoryId !== id));
+    } catch (err) {
+      console.error("Error deleting category:", err);
+      alert(`Failed to delete category: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -71,6 +75,8 @@ const AdminCategory = () => {
         </button>
       </div>
 
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+
       <table className="w-full bg-white shadow-lg rounded-lg">
         <thead>
           <tr>
@@ -80,20 +86,28 @@ const AdminCategory = () => {
           </tr>
         </thead>
         <tbody>
-          {categories.map((category) => (
-            <tr key={category.categoryId}>
-              <td className="border p-2">{category.categoryId}</td>
-              <td className="border p-2">{category.name}</td>
-              <td className="border p-2">
-                <div className="flex justify-center space-x-4">
-                  <FaTrash
-                    className="text-red-500 cursor-pointer hover:text-red-700"
-                    onClick={() => deleteCategory(category.categoryId)}
-                  />
-                </div>
+          {categories.length === 0 ? (
+            <tr>
+              <td colSpan="3" className="text-center p-4">
+                No categories available.
               </td>
             </tr>
-          ))}
+          ) : (
+            categories.map((category) => (
+              <tr key={category.categoryId}>
+                <td className="border p-2">{category.categoryId}</td>
+                <td className="border p-2">{category.name}</td>
+                <td className="border p-2">
+                  <div className="flex justify-center space-x-4">
+                    <FaTrash
+                      className="text-red-500 cursor-pointer hover:text-red-700"
+                      onClick={() => deleteCategory(category.categoryId)}
+                    />
+                  </div>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
 

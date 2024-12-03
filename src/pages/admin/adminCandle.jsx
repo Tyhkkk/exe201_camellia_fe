@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
-import AddCandle from '../../components/candle/addCandel';
-import UpdateCandle from '../../components/candle/UpdateCandle';
+import { useEffect, useState } from "react";
+import apiClient from "../../lib/apiService"; // Sử dụng apiClient
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import AddCandle from "../../components/candle/addCandel";
+import UpdateCandle from "../../components/candle/updateCandle";
 
 const AdminCandle = () => {
   const [candles, setCandles] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedCandle, setSelectedCandle] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchCandles();
@@ -16,26 +17,31 @@ const AdminCandle = () => {
 
   const fetchCandles = async () => {
     try {
-      const response = await axios.get('https://localhost:7065/api/Candle');
+      const response = await apiClient.get("/api/Candle");
       setCandles(response.data);
-    } catch (error) {
-      console.error('Error fetching candles:', error);
+    } catch (err) {
+      console.error("Error fetching candles:", err);
+      setError("Failed to load candles. Please try again.");
     }
   };
 
   const deleteCandle = async (id) => {
+    const confirmed = window.confirm("Are you sure you want to delete this candle?");
+    if (!confirmed) return;
+
     try {
-      await axios.delete(`https://localhost:7065/api/Candle/delete-candle/${id}`);
+      await apiClient.delete(`/api/Candle/delete-candle/${id}`);
       setCandles(candles.filter((candle) => candle.candleId !== id));
-    } catch (error) {
-      console.error('Error deleting candle:', error);
+    } catch (err) {
+      console.error("Error deleting candle:", err);
+      alert("Failed to delete candle. Please try again.");
     }
   };
 
   const handleEditCandle = (candle) => {
     setSelectedCandle({
       ...candle,
-      categoryId: candle.categoryId || '1', // Default value if categoryId is missing
+      categoryId: candle.categoryId || "1", // Default value if categoryId is missing
     });
     setShowUpdateModal(true);
   };
@@ -51,6 +57,8 @@ const AdminCandle = () => {
           <FaPlus className="mr-2" /> Add New Candle
         </button>
       </div>
+
+      {error && <p className="text-red-500 mb-4">{error}</p>}
 
       <table className="w-full bg-white shadow-lg rounded-lg">
         <thead>

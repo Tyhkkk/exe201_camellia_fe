@@ -104,7 +104,7 @@ const Header = () => {
                 <div className="absolute right-0 mt-2 w-64 rounded-lg bg-white shadow-lg z-50">
                   {user ? (
                     <div className="py-2">
-                      <button onClick={() => navigate("/profile")} className="block px-4 py-2 hover:bg-gray-100">
+                      <button onClick={() => navigate("/profileCustomer")} className="block px-4 py-2 hover:bg-gray-100">
                         Hồ sơ
                       </button>
                       <button onClick={() => navigate("/orderHistory")} className="block px-4 py-2 hover:bg-gray-100">

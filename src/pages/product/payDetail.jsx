@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import apiClient from "../../lib/apiService"; // Thay axios bằng apiClient từ thư viện
 import { toast } from 'react-toastify';
 
 const PayDetail = () => {
@@ -12,19 +12,20 @@ const PayDetail = () => {
     setIsLoading(true);
     try {
       console.log('Sending order data:', orderData);
-      const response = await axios.post('https://localhost:7065/api/Order/create', orderData);
+      const response = await apiClient.post('/api/Order/create', orderData); // Sử dụng apiClient
+
       console.log('Full API response:', response);
-  
+
       if (response.data && response.data.data) {
         console.log('Response data:', response.data.data);
-        
+
         if (response.data.data.checkoutUrl) {
           console.log('Checkout URL found:', response.data.data.checkoutUrl);
           
           // Attempt to redirect
           console.log('Attempting to redirect to:', response.data.data.checkoutUrl);
           window.location.href = response.data.data.checkoutUrl;
-          
+
           // Check if redirection didn't happen immediately
           setTimeout(() => {
             if (window.location.href !== response.data.data.checkoutUrl) {
@@ -56,7 +57,6 @@ const PayDetail = () => {
       setIsLoading(false);
     }
   };
-  
 
   return (
     <div className="bg-[#f5f5f5] py-10">
@@ -70,7 +70,7 @@ const PayDetail = () => {
             <h3 className="text-xl font-semibold text-[#6e3a3a] mb-4">Order Summary</h3>
             <div className="mb-4">
               <p className="font-semibold text-gray-700">Description: <span className="text-[#6e3a3a]">{orderData.description}</span></p>
-              <p className="font-semibold text-gray-700 mt-2">Total: <span className="text-xl text-[#6e3a3a]">{orderData.price?.toLocaleString()} VND</span></p>
+              <p className="font-semibold text-gray-700 mt-2">Total: <span className="text-xl text-[#6e3a3a]">{orderData.price ? `${orderData.price.toLocaleString('vi-VN')} VND` : "0 VND"}</span></p>
             </div>
 
             <h4 className="text-lg font-semibold text-[#6e3a3a] mt-4">Order Items</h4>

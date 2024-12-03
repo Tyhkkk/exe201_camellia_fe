@@ -1,23 +1,51 @@
 import { useState } from "react";
+import apiClient from "../lib/apiService"; // Sử dụng apiClient từ thư viện
+import { useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   const [lastName, setLastName] = useState("");
   const [name, setName] = useState("");
   const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
+  // const [gender, setGender] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate(); // Điều hướng sau khi đăng ký thành công
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    console.log({
-      lastName,
-      name,
-      dob,
-      gender,
+
+    // Kiểm tra thông tin đầu vào
+    if (!name || !email || !password) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    // Định dạng payload gửi đến API
+    const userData = {
+      username: `${lastName} ${name}`,
       email,
-      password,
-    });
+      passwordHash: password,
+      roleId: 2, // Luôn luôn là khách hàng
+    };
+
+    try {
+      setIsLoading(true); // Hiển thị trạng thái tải
+      const response = await apiClient.post("/api/User/create", userData);
+
+      // Kiểm tra phản hồi từ API
+      if (response.data?.userId) {
+        alert("Sign up successful! Redirecting to login page...");
+        navigate("/signin"); // Điều hướng về trang đăng nhập
+      } else {
+        alert("Sign up failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Sign up error:", error);
+      alert("An error occurred during sign up. Please try again.");
+    } finally {
+      setIsLoading(false); // Tắt trạng thái tải
+    }
   };
 
   return (
@@ -49,7 +77,7 @@ const SignUp = () => {
             onChange={(e) => setDob(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#7b3d35] focus:border-[#7b3d35]"
           />
-          <div className="flex justify-between">
+          {/* <div className="flex justify-between">
             <label className="flex items-center">
               <input
                 type="radio"
@@ -70,7 +98,7 @@ const SignUp = () => {
               />
               Male
             </label>
-          </div>
+          </div> */}
           <input
             type="email"
             placeholder="Email"
@@ -94,9 +122,12 @@ const SignUp = () => {
           </div>
           <button
             type="submit"
-            className="w-[163px] h-[63px] bg-[#7b3d35] text-white font-jomolhari rounded-lg hover:bg-opacity-90 transition"
+            disabled={isLoading}
+            className={`w-[163px] h-[63px] bg-[#7b3d35] text-white font-jomolhari rounded-lg hover:bg-opacity-90 transition ${
+              isLoading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            SIGN UP
+            {isLoading ? "Signing Up..." : "SIGN UP"}
           </button>
           <div className="text-center text-sm mt-4">
             Already have an account?{" "}

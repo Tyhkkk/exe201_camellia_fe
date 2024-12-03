@@ -17,35 +17,36 @@ const YourCart = () => {
     dispatch(changeQuantity({ candleId, quantity: newQuantity }));
   };
 
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const subtotal = cartItems.reduce((total, item) => {
+    const price = parseFloat(item.price.toString().replace(/,/g, '')); // Loại bỏ dấu phẩy
+    return total + price * item.quantity;
+  }, 0);
+  
   const totalQuantity = cartItems.reduce((total, item) => total + item.quantity, 0);
   const handleCheckout = () => {
     const orderItems = cartItems.map(item => ({
       productName: item.name,
       quantity: item.quantity,
-      priceItem: parseInt(item.price.toString().replace(/,/g, '')),  // Ensure this is a number, not a string with commas
+      priceItem: parseFloat(item.price.toString().replace(/,/g, '')) * 1000, // Chuyển price về số nguyên
     }));
   
-    // Calculate total price as a number (without formatting)
-    const totalPrice = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const totalPrice = orderItems.reduce(
+      (total, item) => total + item.priceItem * item.quantity,
+      0
+    );
   
     const orderData = {
-      description: 'Lô Hàng Nến Thơm',  // Ensure this is a proper string description
-      price: totalPrice,  // Ensure totalPrice is a number, not formatted
-      returnUrl: 'http://localhost:5173',  // leave empty for now
-      cancelUrl: 'http://localhost:5173',  // leave empty for now
+      description: 'Lô Hàng Nến Thơm',
+      price: totalPrice, // Đảm bảo totalPrice là số
+      returnUrl: 'http://localhost:5173/success',
+      cancelUrl: 'http://localhost:5173',
       orderItems: orderItems,
     };
   
-    // Log the order data for debugging
-    console.log('Order Data:', orderData);
-  
-    // Send data to the PayDetail page
+    console.log('Order Data:', orderData); // Debug thông tin truyền qua
     navigate('/paydetail', { state: { orderData } });
   };
+  
   return (
     <div className="bg-[#FDF5F5] min-h-screen py-6">
       <h1 className="text-3xl font-bold text-[#722D2D] text-center mt-6">Your Cart</h1>
@@ -86,7 +87,7 @@ const YourCart = () => {
                   +
                 </button>
                 <p className="text-lg font-semibold text-[#6e3a3a]">
-                  {`${item.price.toLocaleString()}đ`}
+                  {`${item.price.toLocaleString()}`}
                 </p>
               </div>
             </div>

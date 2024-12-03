@@ -4,6 +4,7 @@ import { MdSupportAgent } from "react-icons/md";
 import { AiFillDropboxCircle } from "react-icons/ai";
 import { BsCreditCard2Front } from "react-icons/bs";
 import { CiRedo } from "react-icons/ci";
+import apiClient from "../../../lib/apiService"; // Import axiosClient
 
 const ProductCandles = () => {
   const [candles, setCandles] = useState([]);
@@ -15,20 +16,29 @@ const ProductCandles = () => {
 
   const fetchCandles = async () => {
     try {
-      const response = await fetch("https://localhost:7065/api/Candle");
-      const data = await response.json();
+      const response = await apiClient.get("/api/Candle");
+      console.log("API Response:", response);
+      const data = response.data;
+  
+      // Kiểm tra nếu `data` không phải là mảng
+      if (!data || !Array.isArray(data)) {
+        console.warn("API did not return a valid array");
+        setCandles([]); // Gán giá trị mặc định
+        return;
+      }
+  
       const formattedData = data.map((candle) => ({
-        id: candle.candleId, // Use candleId from API response
+        id: candle.candleId,
         name: candle.name,
         price: `${candle.price.toLocaleString()}đ`,
-        img: candle.imgUrl,
+        img: candle.imgUrl || "https://via.placeholder.com/150",
       }));
       setCandles(formattedData);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching candles:", error);
     }
   };
-
+  
   const handleProductClick = (id) => {
     navigate(`/product/${id}`);
   };
@@ -42,7 +52,7 @@ const ProductCandles = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6 px-4">
         {candles.map((candle) => (
           <div
-            key={candle.id} // Unique key from candleId
+            key={candle.id}
             onClick={() => handleProductClick(candle.id)}
             className="bg-white shadow-lg rounded-lg p-4 cursor-pointer hover:shadow-xl transition-shadow duration-300"
           >

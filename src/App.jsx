@@ -22,6 +22,8 @@ import AdminCategory from "./pages/admin/adminCategory";
 import Orders from "./pages/admin/adminOrders";
 import YourCart from "./pages/product/yourCart";
 import PayDetail from "./pages/product/payDetail";
+import Success from "./pages/success";
+import ProfileCustomer from "./pages/user/profileCus";
 const App = () => {
   return (
     <Router>
@@ -32,18 +34,20 @@ const App = () => {
           <Route path="/signup" element={<MainLayout><SignUp /></MainLayout>} />
           <Route path="/signin" element={<MainLayout><SignIn /></MainLayout>} />
           <Route path="/product/:candleId" element={<MainLayout><ProductDetail /></MainLayout>} />
+          <Route path="/success" element={<MainLayout>< Success/></MainLayout>} />
+          <Route path="/products/scented-candles" element={<MainLayout><ScentedCandle /></MainLayout>} />
+            <Route path="/products/essential-oils" element={<MainLayout><EssentialOils /></MainLayout>} />
+            <Route path="/products/gift-set" element={<MainLayout><GiftSet /></MainLayout>} />
+            <Route path="/products/candle-accessories" element={<MainLayout><CandleAccessories /></MainLayout>} />
           {/* <Route path="/paydetail" element={<MainLayout><PayDetail /></MainLayout>} /> */}
 
           {/* Protected Customer Routes */}
           <Route element={<ProtectedRoute requiredRole="2" />}>
+            <Route path="/profileCustomer" element={<MainLayout><ProfileCustomer /></MainLayout>} />
             <Route path="/aboutus" element={<MainLayout><AboutUs /></MainLayout>} />
             <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
             <Route path="/cart" element={<MainLayout><YourCart /></MainLayout>} />
             <Route path="/paydetail" element={<MainLayout><PayDetail /></MainLayout>} />
-            <Route path="/products/scented-candles" element={<MainLayout><ScentedCandle /></MainLayout>} />
-            <Route path="/products/essential-oils" element={<MainLayout><EssentialOils /></MainLayout>} />
-            <Route path="/products/gift-set" element={<MainLayout><GiftSet /></MainLayout>} />
-            <Route path="/products/candle-accessories" element={<MainLayout><CandleAccessories /></MainLayout>} />
           </Route>
 
           {/* Protected Admin Routes */}

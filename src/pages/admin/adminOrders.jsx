@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import apiClient from "../../lib/apiService"; // Sử dụng apiClient
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -9,7 +9,7 @@ const Orders = () => {
   // Fetch orders từ API
   const fetchOrders = async () => {
     try {
-      const response = await axios.get("https://localhost:7065/api/Order/get-all-order");
+      const response = await apiClient.get("/api/Order/get-all-order");
       setOrders(response.data);
       setLoading(false);
     } catch (error) {
@@ -22,15 +22,22 @@ const Orders = () => {
   const updateOrderStatus = async (orderId, newStatus) => {
     const apiUrl =
       newStatus === "Successful"
-        ? `https://localhost:7065/api/Order/update-order-success/${orderId}`
-        : `https://localhost:7065/api/Order/update-order-canceled/${orderId}`;
+        ? `/api/Order/update-order-success/${orderId}`
+        : `/api/Order/update-order-canceled/${orderId}`;
+    const confirmed = window.confirm(
+      `Are you sure you want to mark this order as ${newStatus}?`
+    );
+    if (!confirmed) return;
+
     try {
-      await axios.put(apiUrl);
+      await apiClient.put(apiUrl);
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order.orderId === orderId ? { ...order, status: newStatus } : order
         )
       );
+      // Tự động đóng dropdown sau khi cập nhật
+      setDropdownOpen((prev) => ({ ...prev, [orderId]: false }));
     } catch (error) {
       console.error("Error updating order status:", error);
     }
@@ -69,6 +76,8 @@ const Orders = () => {
         <h1 className="text-3xl font-bold mb-6">Orders</h1>
         {loading ? (
           <div className="text-center">Loading...</div>
+        ) : orders.length === 0 ? (
+          <div className="text-center text-gray-500">No orders available.</div>
         ) : (
           <div className="overflow-x-auto rounded-lg shadow">
             <table className="min-w-full bg-white border border-gray-300">
@@ -117,16 +126,14 @@ const Orders = () => {
                     </td>
                     <td className="px-4 py-3 border-b">{order.isPay ? "Paid" : "NotPay"}</td>
                     <td className="px-4 py-3 border-b relative">
-                      {/* Nút 3 chấm */}
                       <button
                         className="text-gray-700 hover:text-gray-900 focus:outline-none"
                         onClick={() => toggleDropdown(order.orderId)}
                       >
                         &#x22EE;
                       </button>
-                      {/* Dropdown menu */}
                       {dropdownOpen[order.orderId] && (
-                        <div className="absolute right-0 mt-2 w-32 bg-white rounded shadow-lg border">
+                        <div className="absolute right-0 mt-2 w-32 bg-white rounded shadow-lg border z-50">
                           <ul>
                             <li
                               className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"

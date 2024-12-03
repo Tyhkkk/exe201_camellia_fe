@@ -1,4 +1,3 @@
-// src/pages/SignIn.jsx
 import { useState } from 'react';
 import { useAuth } from '../context/auth/AuthContext';
 
@@ -57,11 +56,6 @@ const SignIn = () => {
               onChange={(e) => handleChange('passwordHash', e.target.value)}
             />
           </div>
-          <p className="text-xs text-gray-500">
-            This site is protected by reCAPTCHA and the
-            <a href="#" className="text-blue-500 underline ml-1">Google Privacy Policy</a> and
-            <a href="#" className="text-blue-500 underline ml-1">Terms of Service</a> apply.
-          </p>
           <button
             type="submit"
             className="w-full py-3 mt-4 bg-[#a05c55] text-white rounded-md font-semibold hover:bg-[#7a403f]"

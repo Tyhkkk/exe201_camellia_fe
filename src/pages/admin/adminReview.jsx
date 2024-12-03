@@ -1,24 +1,22 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../lib/apiService"; // Sử dụng apiClient
 import { FaTrash, FaStar } from "react-icons/fa";
 
 const AdminReview = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedReview, setSelectedReview] = useState(null);
-
-  // URL API
-  const apiUrl = "https://localhost:7065/api/Review";
-  const deleteUrl = "https://localhost:7065/api/Review/delete-review/";
+  const [error, setError] = useState(null);
 
   // Fetch reviews
   const fetchReviews = async () => {
     try {
-      const response = await axios.get(apiUrl);
+      const response = await apiClient.get("/api/Review");
       setReviews(response.data);
-    } catch (error) {
-      console.error("Error fetching reviews:", error);
-    } finally {
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching reviews:", err);
+      setError("Failed to load reviews. Please try again.");
       setLoading(false);
     }
   };
@@ -26,11 +24,14 @@ const AdminReview = () => {
   // Delete review
   const deleteReview = async (reviewId) => {
     try {
-      await axios.delete(`${deleteUrl}${reviewId}`);
-      setReviews(reviews.filter((review) => review.reviewId !== reviewId));
+      await apiClient.delete(`/api/Review/delete-review/${reviewId}`);
+      setReviews((prevReviews) =>
+        prevReviews.filter((review) => review.reviewId !== reviewId)
+      );
       setSelectedReview(null); // Close the confirmation popup
-    } catch (error) {
-      console.error("Error deleting review:", error);
+    } catch (err) {
+      console.error("Error deleting review:", err);
+      alert(`Failed to delete review: ${err.response?.data?.message || err.message}`);
     }
   };
 
@@ -38,6 +39,7 @@ const AdminReview = () => {
     fetchReviews();
   }, []);
 
+  // Hiển thị số sao
   const renderStars = (rating) => {
     return Array.from({ length: 5 }, (_, index) => (
       <FaStar
@@ -49,10 +51,29 @@ const AdminReview = () => {
     ));
   };
 
+  // Nếu đang tải dữ liệu
   if (loading) {
     return (
       <div className="text-center text-lg font-semibold mt-8">
         Loading reviews...
+      </div>
+    );
+  }
+
+  // Nếu xảy ra lỗi
+  if (error) {
+    return (
+      <div className="text-center text-red-500 text-lg font-semibold mt-8">
+        {error}
+      </div>
+    );
+  }
+
+  // Nếu không có đánh giá
+  if (reviews.length === 0) {
+    return (
+      <div className="text-center text-gray-500 text-lg font-semibold mt-8">
+        No reviews available.
       </div>
     );
   }

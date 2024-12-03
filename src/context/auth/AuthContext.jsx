@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate } from 'react-router-dom';
+import apiClient from '../../lib/apiService'; // Sử dụng axiosClient từ apiService.js
 
 const AuthContext = createContext();
 
@@ -11,43 +11,52 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // Thêm trạng thái isLoading
   const navigate = useNavigate();
 
   const decodeToken = (token) => {
     try {
       const decoded = jwtDecode(token);
-      const userId = decoded.UserId; // Extract the UserId from the token
-      localStorage.setItem('userId', userId); // Store UserId in localStorage
 
+      // Lưu thông tin người dùng từ token
       setUser({
         sub: decoded.sub,
         name: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'],
         role: decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
-        userId: userId, // Add UserId to the user state
+        userId: decoded.UserId,
       });
+
+      // Lưu trạng thái xác thực
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Error decoding token:', error);
-      logout();
+      logout(); // Token không hợp lệ
     }
   };
 
   useEffect(() => {
     if (token) {
-      decodeToken(token);
+      decodeToken(token); // Giải mã token khi khởi chạy
     }
   }, [token]);
 
   const login = async ({ email, passwordHash }) => {
+    setIsLoading(true); // Bắt đầu loading
     try {
-      const response = await axios.post('https://localhost:7065/api/Authen/login', { email, passwordHash });
+      const response = await apiClient.post('/api/Authen/login', { email, passwordHash });
+
+      // Xác thực thành công
       if (response.data.success) {
         const token = response.data.token;
-        setToken(token);
+
+        // Lưu token vào localStorage
         localStorage.setItem('token', token);
+        setToken(token);
+
+        // Giải mã token và lưu thông tin người dùng
         decodeToken(token);
 
-        // Navigate based on role
+        // Điều hướng dựa trên vai trò
         const role = jwtDecode(token)['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
         if (role === '1') {
           navigate('/admin');
@@ -55,11 +64,13 @@ export const AuthProvider = ({ children }) => {
           navigate('/');
         }
       } else {
-        alert('Login failed');
+        alert('Login failed: ' + response.data.message);
       }
     } catch (error) {
       console.error('Login error:', error);
       alert('Login failed, please check your credentials');
+    } finally {
+      setIsLoading(false); // Dừng loading
     }
   };
 
@@ -68,12 +79,11 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setIsAuthenticated(false);
     localStorage.removeItem('token');
-    localStorage.removeItem('userId'); // Remove UserId from localStorage
     navigate('/signin');
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

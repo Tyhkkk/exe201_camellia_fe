@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import axios from "axios";
+import apiClient from "../../lib/apiService"; // Sử dụng axiosClient
 
 const AddCandle = ({ onClose, onAdd }) => {
   const [newCandle, setNewCandle] = useState({
@@ -13,15 +13,17 @@ const AddCandle = ({ onClose, onAdd }) => {
   });
 
   const [categories, setCategories] = useState([]);
+  const [error, setError] = useState(null);
 
   // Fetch categories từ API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get("https://localhost:7065/api/Category");
+        const response = await apiClient.get("/api/Category");
         setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
+      } catch (err) {
+        console.error("Error fetching categories:", err);
+        setError("Failed to load categories. Please try again.");
       }
     };
 
@@ -38,6 +40,18 @@ const AddCandle = ({ onClose, onAdd }) => {
   };
 
   const handleAddCandle = async () => {
+    // Kiểm tra dữ liệu đầu vào
+    if (
+      !newCandle.name ||
+      !newCandle.description ||
+      !newCandle.price ||
+      !newCandle.stockQuantity ||
+      !newCandle.categoryId
+    ) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
     try {
       const formData = new FormData();
       formData.append("name", newCandle.name);
@@ -51,15 +65,25 @@ const AddCandle = ({ onClose, onAdd }) => {
         formData.append("imgFile", newCandle.imgFile);
       }
 
-      // Gửi dữ liệu đến URL đúng
-      await axios.post("https://localhost:7065/api/Candle/create", formData, {
+      // Gửi dữ liệu đến API
+      await apiClient.post("/api/Candle/create", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
+      alert("Candle added successfully!");
       onAdd();
+      setNewCandle({
+        name: "",
+        description: "",
+        price: "",
+        stockQuantity: "",
+        categoryId: "",
+        imgFile: null,
+      }); // Reset form
       onClose();
-    } catch (error) {
-      console.error("Error adding candle:", error);
+    } catch (err) {
+      console.error("Error adding candle:", err);
+      alert("Failed to add candle. Please try again.");
     }
   };
 
@@ -67,6 +91,7 @@ const AddCandle = ({ onClose, onAdd }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
         <h3 className="text-xl font-bold mb-4">Add New Candle</h3>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="space-y-4">
           <input
             type="text"

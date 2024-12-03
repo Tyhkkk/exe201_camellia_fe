@@ -1,32 +1,40 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from "react";
+import apiClient from "../../lib/apiService";
 
 const AdminProfile = () => {
   const [user, setUser] = useState(null);
-  const userId = localStorage.getItem('userId'); // Get userId from localStorage
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const userId = localStorage.getItem("userId"); // Lấy userId từ localStorage
 
   useEffect(() => {
     if (userId) {
-      fetchUser();
+      fetchUser(userId);
+    } else {
+      setError("User ID not found in localStorage.");
+      setLoading(false);
     }
   }, [userId]);
 
-  const fetchUser = async () => {
+  const fetchUser = async (userId) => {
     try {
-      const response = await axios.get(`https://localhost:7065/api/User`);
-      const userData = response.data.find((u) => u.userId === parseInt(userId)); // Match userId
-      if (userData) {
-        setUser(userData);
-      } else {
-        console.error('User not found');
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
+      const response = await apiClient.get(`/api/User/${userId}`);
+      setUser(response.data); // Gán dữ liệu user từ API
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching user data:", err);
+      setError("Failed to fetch user data. Please try again.");
+      setLoading(false);
     }
   };
 
-  if (!user) {
+  if (loading) {
     return <div className="text-center text-gray-600">Loading...</div>;
+  }
+
+  if (error) {
+    return <div className="text-center text-red-500">{error}</div>;
   }
 
   return (
@@ -40,7 +48,7 @@ const AdminProfile = () => {
           <div className="ml-6">
             <h3 className="text-2xl font-bold text-gray-800">{user.username}</h3>
             <p className="text-gray-500">
-              {user.roleId === 1 ? 'Admin' : 'User'}
+              {user.roleId === 1 ? "Admin" : "User"}
             </p>
           </div>
         </div>
@@ -60,7 +68,7 @@ const AdminProfile = () => {
           <div className="text-center mt-6">
             <button
               className="px-6 py-2 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-300"
-              onClick={() => alert('Edit functionality coming soon!')}
+              onClick={() => alert("Edit functionality coming soon!")}
             >
               Edit Profile
             </button>

@@ -1,20 +1,22 @@
 // UpdateCandle.jsx
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
+import apiClient from '../../lib/apiService'; // Sử dụng apiClient
 
 const UpdateCandle = ({ candle, onClose, onUpdate }) => {
   const [updatedCandle, setUpdatedCandle] = useState({ ...candle });
   const [categories, setCategories] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Fetch category options from the API
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://localhost:7065/api/Category');
+        const response = await apiClient.get('/api/Category');
         setCategories(response.data);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+        setError('Failed to load categories. Please try again.');
       }
     };
 
@@ -31,39 +33,47 @@ const UpdateCandle = ({ candle, onClose, onUpdate }) => {
   };
 
   const handleUpdateCandle = async () => {
+    // Kiểm tra dữ liệu đầu vào
+    if (
+      !updatedCandle.name ||
+      !updatedCandle.description ||
+      !updatedCandle.price ||
+      !updatedCandle.stockQuantity ||
+      !updatedCandle.categoryId
+    ) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+
     try {
       const formData = new FormData();
 
       // Append all fields explicitly
       formData.append('candleId', updatedCandle.candleId);
-      formData.append('name', updatedCandle.name || '');
-      formData.append('description', updatedCandle.description || '');
-      formData.append('price', updatedCandle.price || 0);
-      formData.append('stockQuantity', updatedCandle.stockQuantity || 0);
-      formData.append('categoryId', updatedCandle.categoryId || '1');
-
-      // Add createAt and updateAt as empty (null or empty string)
-      formData.append('createAt', '');
-      formData.append('updateAt', '');
+      formData.append('name', updatedCandle.name);
+      formData.append('description', updatedCandle.description);
+      formData.append('price', updatedCandle.price);
+      formData.append('stockQuantity', updatedCandle.stockQuantity);
+      formData.append('categoryId', updatedCandle.categoryId);
+      formData.append('createAt', ''); // Send empty string for createAt
+      formData.append('updateAt', ''); // Send empty string for updateAt
 
       // Append the image file only if it exists
       if (updatedCandle.imgFile) {
         formData.append('imgFile', updatedCandle.imgFile);
       }
 
-      // Send the PUT request
-      await axios.put(
-        `https://localhost:7065/api/Candle/update/${updatedCandle.candleId}`,
-        formData,
-        {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        }
-      );
+      // Send the PUT request using apiClient
+      await apiClient.put(`/api/Candle/update/${updatedCandle.candleId}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
+      alert('Candle updated successfully!');
       onUpdate();
       onClose();
-    } catch (error) {
-      console.error('Error updating candle:', error.response?.data || error.message);
+    } catch (err) {
+      console.error('Error updating candle:', err.response?.data || err.message);
+      alert('Failed to update candle. Please try again.');
     }
   };
 
@@ -71,6 +81,7 @@ const UpdateCandle = ({ candle, onClose, onUpdate }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
         <h3 className="text-xl font-bold mb-4">Update Candle</h3>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
         <div className="space-y-4">
           <input
             type="text"

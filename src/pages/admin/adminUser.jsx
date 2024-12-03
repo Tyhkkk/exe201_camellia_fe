@@ -1,53 +1,61 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import apiClient from "../../lib/apiService"; // Sử dụng apiClient
 import { FaTrash, FaEdit } from "react-icons/fa";
 
 const AdminUser = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(false); // Trạng thái tải khi thực hiện hành động
   const [selectedUser, setSelectedUser] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
-
-  // API URLs
-  const apiUrl = "https://localhost:7065/api/User";
-  const updateUrl = "https://localhost:7065/api/User/update/";
-  const deleteUrl = "https://localhost:7065/api/User/delete-user/";
+  const [error, setError] = useState(null);
 
   // Fetch users
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(apiUrl);
+      const response = await apiClient.get("/api/User");
       setUsers(response.data);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    } finally {
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching users:", err);
+      setError("Failed to load users. Please try again.");
       setLoading(false);
     }
   };
 
   // Delete user
   const deleteUser = async (userId) => {
+    if (!window.confirm("Are you sure you want to delete this user?")) return;
+
+    setActionLoading(true);
     try {
-      await axios.delete(`${deleteUrl}${userId}`);
-      setUsers(users.filter((user) => user.userId !== userId));
-    } catch (error) {
-      console.error("Error deleting user:", error);
+      await apiClient.delete(`/api/User/delete-user/${userId}`);
+      setUsers((prevUsers) => prevUsers.filter((user) => user.userId !== userId));
+    } catch (err) {
+      console.error("Error deleting user:", err);
+      alert(`Failed to delete user: ${err.response?.data?.message || err.message}`);
+    } finally {
+      setActionLoading(false);
     }
   };
 
   // Update user
   const updateUser = async (updatedUser) => {
+    setActionLoading(true);
     try {
-      await axios.put(`${updateUrl}${updatedUser.userId}`, updatedUser);
-      setUsers(
-        users.map((user) =>
+      await apiClient.put(`/api/User/update/${updatedUser.userId}`, updatedUser);
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
           user.userId === updatedUser.userId ? updatedUser : user
         )
       );
       setShowEditForm(false);
       setSelectedUser(null);
-    } catch (error) {
-      console.error("Error updating user:", error);
+    } catch (err) {
+      console.error("Error updating user:", err);
+      alert(`Failed to update user: ${err.response?.data?.message || err.message}`);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -59,6 +67,14 @@ const AdminUser = () => {
     return (
       <div className="text-center text-lg font-semibold mt-8">
         Loading users...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-500 text-lg font-semibold mt-8">
+        {error}
       </div>
     );
   }
@@ -176,13 +192,15 @@ const AdminUser = () => {
                 <button
                   type="submit"
                   className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition"
+                  disabled={actionLoading}
                 >
-                  Save
+                  {actionLoading ? "Saving..." : "Save"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowEditForm(false)}
                   className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition"
+                  disabled={actionLoading}
                 >
                   Cancel
                 </button>
