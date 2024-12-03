@@ -1,29 +1,29 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import MainLayout from "./components/narbar/mainLayout";
-import AdminLayout from "./components/narbar/adminLayout";
-import HomePage from "./pages/HomePage";
-import AboutUs from "./pages/AboutUs";
-import Contact from "./pages/Contact";
-import EssentialOils from "./pages/product/EssentialOils";
-import GiftSet from "./pages/product/GiftSet";
-import CandleAccessories from "./pages/product/CandleAccessories";
-import SignUp from "./pages/SignUp";
-import SignIn from "./pages/SignIn";
-import AdminHome from "./pages/admin/adminHome";
-import AdminCandle from "./pages/admin/adminCandle"; // Import your admin page
-import { AuthProvider } from "./context/auth/AuthContext";
-import ProtectedRoute from "./components/auth/ProtectRole";
-import ProductDetail from "./pages/product/productDetail";
-import AdminReview from "./pages/admin/adminReview";
-import AdminUser from "./pages/admin/adminUser";
-import AdminProfile from "./pages/admin/adminProfile";
-import AdminCategory from "./pages/admin/adminCategory";
-import Orders from "./pages/admin/adminOrders";
-import YourCart from "./pages/product/yourCart";
-import PayDetail from "./pages/product/payDetail";
-import Success from "./pages/success";
-import ProfileCustomer from "./pages/user/profileCus";
-import ScentedCandle from "./pages/product/ScentedCandle";
+import MainLayout from "../src/components/narbar/mainLayout";
+import AdminLayout from "../src/components/narbar/adminLayout";
+import HomePage from "../src/pages/HomePage";
+import AboutUs from "../src/pages/AboutUs";
+import Contact from "../src/pages/Contact";
+import EssentialOils from "../src/pages/product/essentialOils";
+import GiftSet from "../src/pages/product/giftSet";
+import CandleAccessories from "../src/pages/product/candleAccessories";
+import SignUp from "../src/pages/SignUp";
+import SignIn from "../src/pages/SignIn";
+import AdminHome from "../src/pages/admin/adminHome";
+import AdminCandle from "../src/pages/admin/adminCandle";
+import AdminReview from "../src/pages/admin/adminReview";
+import AdminUser from "../src/pages/admin/adminUser";
+import AdminProfile from "../src/pages/admin/adminProfile";
+import AdminCategory from "../src/pages/admin/adminCategory"; // Import your admin page
+import { AuthProvider } from "../src/context/auth/AuthContext";
+import ProtectedRoute from "../src/components/auth/ProtectRole";
+import ProductDetail from "../src/pages/product/productDetail";
+import Orders from "../src/pages/admin/adminOrders";
+import YourCart from "../src/pages/product/yourCart";
+import PayDetail from "../src/pages/product/payDetail";
+import Success from "../src/pages/success";
+import ProfileCustomer from "../src/pages/user/profileCus";
+import ScentedCandle from "../src/pages/product/scentedCandle";
 
 
 const App = () => {
